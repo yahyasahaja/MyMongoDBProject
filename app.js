@@ -1,46 +1,25 @@
-const { MongoClient, ObjectID } = require('mongodb');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
-    if (err) return console.log("Unable to connect to MongoDB server: ", err);
-    console.log("Connected to MongoDB server");
+const port = process.env.PORT || 3000;
 
-    db.collection('Users').findOneAndUpdate({
-        name: 'Yahya Sahaja'
-    }, {
-        $set: {
-            location: 'Malang'
-        }
-    }, {
-        returnOriginal: true
-    }).then((result) => {
-        console.log(result);
-    }, (err) => {
-        console.log(err);
-    });
+const mongoose = require('mongoose');
+const { url } = require('./config/database');
+const { User } = require('./app/model/User');
 
-    // db.collection('Todos').find().toArray().then((user) => {
-    //     console.log('Todos colelction data is fetched');
-    //     console.log(JSON.stringify(user, undefined, 2));
-    // }, (err) => {
-    //     console.log(err);
-    // });
+var app = express();
+app.use(bodyParser.json());
 
-    // db.collection('Todos').insertOne({
-    //     text: 'Something to do',
-    //     completed: false
-    // }, (err, result) => {
-    //     if (err) console.log('Unable to insert todo');
-    //     console.log(JSON.stringify(result.ops, undefined, 2));
-    // });
+//DATABASE CONNECTION
+mongoose.Promise = global.Promise;
+mongoose.connect(url);
 
-    // db.collection('Users').insertOne({
-    //     name: 'Yahya Sahaja',
-    //     age: 19,
-    //     location: 'Purwokerto'
-    // }, (err, result) => {
-    //     if (err) console.log('Unable to insert data to Users');
-    //     console.log(JSON.stringify(result.ops, undefined, 2));
-    // });
-
-    //db.close();
+//ROUTER
+app.post('/todos', (req, res) => {
+    var { email } = req.body;
+    var user = new User();
+    user.email = email;
+    user.save().then(doc => res.send(doc), err => res.send(err));
 });
+
+app.listen(port, () => console.log(`Server running on port ${ port }`));
