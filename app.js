@@ -15,11 +15,15 @@ mongoose.Promise = global.Promise;
 mongoose.connect(url);
 
 //ROUTER
+app.get('/todos', (req, res) => {
+    User.count().then(n => res.send(`we have ${n} data`), err => res.send(`Unable to fetch data: ${err}`));
+});
+
 app.post('/todos', (req, res) => {
     var { email } = req.body;
     var user = new User();
     user.email = email;
-    user.save().then(doc => res.send(doc), err => res.send(err));
+    user.save().then(doc => res.send(doc), err => res.status(401).send(err));
 });
 
 app.listen(port, () => console.log(`Server running on port ${ port }`));
