@@ -1,15 +1,29 @@
 const { MongoClient, ObjectID } = require('mongodb');
 
 MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
-    if (err) return console.log("Unable to connect to MongoDB server");
+    if (err) return console.log("Unable to connect to MongoDB server: ", err);
     console.log("Connected to MongoDB server");
 
-    db.collection('Todos').find().toArray().then((user) => {
-        console.log('Todos colelction data is fetched');
-        console.log(JSON.stringify(user, undefined, 2));
+    db.collection('Users').findOneAndUpdate({
+        name: 'Yahya Sahaja'
+    }, {
+        $set: {
+            location: 'Malang'
+        }
+    }, {
+        returnOriginal: true
+    }).then((result) => {
+        console.log(result);
     }, (err) => {
         console.log(err);
     });
+
+    // db.collection('Todos').find().toArray().then((user) => {
+    //     console.log('Todos colelction data is fetched');
+    //     console.log(JSON.stringify(user, undefined, 2));
+    // }, (err) => {
+    //     console.log(err);
+    // });
 
     // db.collection('Todos').insertOne({
     //     text: 'Something to do',
@@ -28,5 +42,5 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
     //     console.log(JSON.stringify(result.ops, undefined, 2));
     // });
 
-    db.close();
+    //db.close();
 });
