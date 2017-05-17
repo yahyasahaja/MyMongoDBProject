@@ -8,6 +8,8 @@ const { ObjectID } = require('mongodb');
 const { url } = require('./config/database');
 const { User } = require('./app/model/User');
 
+const _ = require('lodash');
+
 var app = express();
 app.use(bodyParser.json());
 
@@ -19,7 +21,22 @@ mongoose.connect(url);
 // usr.email = 'yahya@mail.com';
 // usr.save().then(doc => console.log(usr), err => console.log(err));
 
-//ROUTER
+//ROUTER USER
+app.post('/user', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+    const user = new User(body);
+
+    user.save().then(usr => {
+        let a = usr.generateAuthToken();
+        console.log(a);
+        console.log(2);
+        return a;
+    }).then(token => {
+        res.header('x-auth', token).send(user);
+    }).catch(err => res.status(400).send(err));
+});
+
+//ROUTER TODO
 app.get('/todos', (req, res) => {
     User.count().then(n => res.send(`we have ${n} data`), err => res.send(`Unable to fetch data: ${err}`));
 });
